@@ -32,7 +32,6 @@ classifiers = [
     "Programming Language :: Rust",
     "Topic :: Text Processing :: Linguistic",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Natural Language :: Malagasy",
 ]
 
 [tool.maturin]
