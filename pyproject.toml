@@ -1,0 +1,46 @@
+[build-system]
+requires = ["maturin>=1.5,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "malagasy-stemmer"
+version = "0.1.0"
+description = "High-performance morphological stemmer for the Malagasy language, written in Rust"
+readme = "README.md"
+authors = [{ name = "Fanilo", email = "fanilo@smartrag.dev" }]
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+keywords = [
+    "malagasy",
+    "stemmer",
+    "nlp",
+    "morphology",
+    "madagascar",
+    "tokenizer",
+    "low-resource-languages",
+    "austronesian",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Rust",
+    "Topic :: Text Processing :: Linguistic",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Natural Language :: Malagasy",
+]
+
+[tool.maturin]
+manifest-path = "crates/malagasy-stemmer-py/Cargo.toml"
+module-name = "malagasy_stemmer._core"
+python-source = "python"
+features = ["pyo3/extension-module"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

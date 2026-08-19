@@ -1,0 +1,15 @@
+[package]
+name = "malagasy-stemmer-py"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Python bindings for the Malagasy morphological stemmer"
+
+[lib]
+name = "_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.21", features = ["extension-module", "abi3-py311"] }
+malagasy-stemmer = { path = "../malagasy-stemmer" }
