@@ -1,16 +1,21 @@
-# 🇲🇬 malagasy-stemmer
+# malagasy-stemmer
 
+[![PyPI version](https://img.shields.io/pypi/v/malagasy-stemmer.svg?color=blue)](https://pypi.org/project/malagasy-stemmer/)
+[![Documentation](https://img.shields.io/badge/docs-GitHub_Pages-teal.svg)](https://tanguy1902.github.io/malagasy-stemmer/)
+[![CI](https://github.com/Tanguy1902/malagasy-stemmer/actions/workflows/CI.yml/badge.svg)](https://github.com/Tanguy1902/malagasy-stemmer/actions/workflows/CI.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Rust](https://img.shields.io/badge/rust-2021-orange.svg)](https://www.rust-lang.org)
 [![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue.svg)](https://www.python.org)
 
 **Moteur de stemming morphologique et de tokenisation haute performance pour la langue malgache (_Teny Malagasy_).**
 
+**Documentation officielle complète :** [https://tanguy1902.github.io/malagasy-stemmer/](https://tanguy1902.github.io/malagasy-stemmer/)
+
 Développé en **Rust** avec des structures de données **FST** (_Finite State Transducers_), de la morphologie formelle à deux niveaux (_Two-Level Morphology_) et un décodage probabiliste inspiré de l'algorithme de **Viterbi**.
 
 ---
 
-## ⚡ Fonctionnalités
+## Fonctionnalités
 
 - **Normalisation morphologique complète (_Fototeny_)** :
   - **Préfixes & mutations nasales** : `man-`, `mam-`, `mang-`, `nan-`, `han-`, `fan-`, `mpan-`, `fampi-`, `maha-`...
@@ -167,6 +172,6 @@ Le dictionnaire d'ancrage est stocké dans [`crates/malagasy-stemmer/data/roots.
 
 ---
 
-## 📄 Licence
+## Licence
 
 Distribué sous licence **Apache-2.0**.
