@@ -50,11 +50,11 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install maturin & pytest
-        run: pip install maturin pytest
-
-      - name: Build & install with maturin
-        run: maturin develop
+      - name: Install dependencies & package
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          pip install .
 
       - name: Run pytest
         run: pytest tests/python -v

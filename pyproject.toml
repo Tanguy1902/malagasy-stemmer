@@ -39,7 +39,6 @@ classifiers = [
 manifest-path = "crates/malagasy-stemmer-py/Cargo.toml"
 module-name = "malagasy_stemmer._core"
 python-source = "python"
-features = ["pyo3/extension-module"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
