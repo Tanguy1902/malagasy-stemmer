@@ -68,15 +68,74 @@ print(normalized_chunk)
 
 ---
 
-## 3. Intégration dans Tantivy / Meilisearch (Rust)
+## 3. Intégration dans le moteur de recherche Tantivy (Rust)
 
-Dans les moteurs de recherche écrits en Rust comme **Tantivy**, vous pouvez implémenter le trait `TokenFilter` avec `malagasy_stemmer::stem` pour créer un filtre de recherche malgache natif ultra-rapide.
+`malagasy-stemmer` s'intègre nativement dans le moteur de recherche full-text **Tantivy** via la feature optionnelle `tantivy` (`features = ["tantivy"]`).
+
+Elle fournit `MalagasyStemFilter` (implémentant `tantivy::tokenizer::TokenFilter`) ainsi qu'un analyseur prêt à l'emploi `create_malagasy_analyzer()`.
+
+### Configuration Cargo (`Cargo.toml`)
+
+```toml
+[dependencies]
+tantivy = "0.22"
+malagasy-stemmer = { version = "0.1", features = ["tantivy"] }
+```
+
+### Exemple complet d'indexation et de recherche
 
 ```rust
-use malagasy_stemmer::stem;
+use malagasy_stemmer::create_malagasy_analyzer;
+use tantivy::collector::TopDocs;
+use tantivy::doc;
+use tantivy::query::QueryParser;
+use tantivy::schema::*;
+use tantivy::{Index, TantivyDocument};
 
-// Pseudo-code d'un filtre Tantivy / Search Engine
-fn stem_token_stream(tokens: Vec<String>) -> Vec<String> {
-    tokens.into_iter().map(|t| stem(&t)).collect()
+fn main() -> tantivy::Result<()> {
+    // 1. Définition du schéma avec analyseur 'malagasy'
+    let mut schema_builder = Schema::builder();
+    let text_options = TextOptions::default()
+        .set_indexing_options(
+            TextFieldIndexing::default()
+                .set_tokenizer("malagasy")
+                .set_index_option(IndexRecordOption::WithFreqsAndPositions),
+        )
+        .set_stored();
+
+    let title = schema_builder.add_text_field("title", STRING | STORED);
+    let body = schema_builder.add_text_field("body", text_options);
+    let schema = schema_builder.build();
+
+    let index = Index::create_in_ram(schema);
+
+    // 2. Enregistrer l'analyseur morphologique
+    index
+        .tokenizers()
+        .register("malagasy", create_malagasy_analyzer());
+
+    // 3. Indexer des documents
+    let mut writer = index.writer(15_000_000)?;
+    writer.add_document(doc!(
+        title => "Fampianarana",
+        body => "Nanoratra taratasy momba ny fampianarana ny mpianatra."
+    ))?;
+    writer.commit()?;
+
+    // 4. Recherche avec une forme fléchie différente ("soratana" ou "mianatra")
+    let reader = index.reader()?;
+    let searcher = reader.searcher();
+    let query_parser = QueryParser::for_index(&index, vec![body]);
+
+    // La requête "soratana" (passif) matche "Nanoratra" (actif passé) grâce à la racine 'soratra' !
+    let query = query_parser.parse_query("soratana")?;
+    let top_docs = searcher.search(&query, &TopDocs::with_limit(5))?;
+
+    for (_score, doc_address) in top_docs {
+        let retrieved: TantivyDocument = searcher.doc(doc_address)?;
+        println!("Document trouvé : {:?}", retrieved.get_first(title).unwrap().as_str());
+    }
+
+    Ok(())
 }
 ```

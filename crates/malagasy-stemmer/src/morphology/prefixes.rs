@@ -34,7 +34,7 @@ pub fn generate_prefix_candidates(word: &str, dict: &FstDictionary) -> Vec<Prefi
                 candidates.push(PrefixCandidate {
                     root: as_is,
                     prefix: rule.prefix.to_string(),
-                    weight: if in_dict { 0.95 } else { 0.85 },
+                    weight: if in_dict { 1.0 } else { 0.85 },
                 });
             }
 
@@ -66,10 +66,11 @@ pub fn generate_prefix_candidates(word: &str, dict: &FstDictionary) -> Vec<Prefi
     for &prefix in SIMPLE_PREFIXES {
         if let Some(remainder) = word.strip_prefix(prefix) {
             if remainder.len() >= 2 {
-                let is_weak_short_prefix = (prefix == "ma" || prefix == "fa" || prefix == "ha")
+                let is_weak_short_prefix = (prefix == "ma" || prefix == "fa" || prefix == "ha" || prefix == "fi")
                     && (word.starts_with("mam") || word.starts_with("man") || word.starts_with("mang")
                         || word.starts_with("fam") || word.starts_with("fan") || word.starts_with("fang")
-                        || word.starts_with("ham") || word.starts_with("han") || word.starts_with("hang"));
+                        || word.starts_with("ham") || word.starts_with("han") || word.starts_with("hang")
+                        || (prefix == "fi" && (word.ends_with("ina") || word.ends_with("io") || word.ends_with("ena"))));
 
                 let in_dict = dict.contains(remainder);
                 let base_w = if in_dict {

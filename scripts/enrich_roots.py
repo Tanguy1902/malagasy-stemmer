@@ -2,9 +2,9 @@
 """
 Script d'extraction et d'enrichissement massif du dictionnaire de racines pures (fototeny) malgaches.
 Combine :
-1. Dictionnaire de base existant (crates/malagasy-stemmer/data/roots.tsv)
+1. Dictionnaire de base et racines canoniques requises
 2. Kaikki.org / Wiktionary Malagasy (kaikki.org-dictionary-Malagasy.jsonl)
-3. Rakibolana Malagasy structuré (scratch/rakibolana_malagasy/json/*.json)
+3. Rakibolana Malagasy structuré (scratch/rakibolana_malagasy/sqlite/rakibolana.db)
 
 Garantit :
 - Validation orthographique stricte (alphabet malgache à 21 lettres, terminaisons phonotactiques régulières)
@@ -12,19 +12,23 @@ Garantit :
 - Tri alphabétique strict (requis pour la compilation du Transducteur à États Finis FST en Rust)
 """
 
-import glob
-import json
 import os
 import re
-import sys
+import json
+import sqlite3
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOTS_TSV_PATH = BASE_DIR / "crates" / "malagasy-stemmer" / "data" / "roots.tsv"
 KAIKKI_PATH = BASE_DIR / "kaikki.org-dictionary-Malagasy.jsonl"
-RAKIBOLANA_DIR = Path("/home/fanilo/.gemini/antigravity-ide/brain/f1a23a37-7f6b-4e3a-9616-b586426c9191/scratch/rakibolana_malagasy/json")
+RAKIBOLANA_DB_PATH = Path("/home/fanilo/.gemini/antigravity-ide/brain/f1a23a37-7f6b-4e3a-9616-b586426c9191/scratch/rakibolana_malagasy/sqlite/rakibolana.db")
 
 MALAGASY_INVALID_LETTERS = set("cqwx")
+
+DIALECT_MARKERS = {
+    "btl", "sak", "ant", "tsim", "bara", "bet", "antais", "tanala", "vezo",
+    "sakalava", "betsimisaraka", "merina", "mah", "j.f", "jf", "antandroy", "ski"
+}
 
 # Adjectifs et noms légitimes commençant par ma/mam/man/mi qui sont de vraies racines simples
 LEGITIMATE_PREFIX_LIKE_ROOTS = {
@@ -58,38 +62,81 @@ CANONICAL_REQUIRED_ROOTS = {
     "izany": "pron", "izao": "pron", "izay": "pron", "izy": "pron", "ka": "conj",
     "kalo": "n", "karoka": "n", "kely": "adj", "kibo": "n", "kintana": "n", "koba": "n",
     "kodia": "n", "kofehy": "n", "kolontsaina": "n", "lala": "v", "lalana": "n",
-    "laza": "v", "leha": "v", "lehibe": "adj", "lehibe": "adj", "loha": "n", "loko": "n",
-    "lositra": "v", "madio": "adj", "mafy": "adj", "mainty": "adj", "maintso": "adj",
-    "maizina": "adj", "malemy": "adj", "mamy": "adj", "manify": "adj", "manitra": "adj",
-    "manta": "adj", "marary": "adj", "marina": "adj", "maro": "adj", "masaka": "adj",
-    "masina": "adj", "maso": "n", "masoandro": "n", "mavo": "adj", "misy": "v",
-    "mora": "adj", "namana": "n", "neny": "n", "nify": "n", "nofo": "n",
-    "ody": "n", "olona": "n", "ome": "v", "ondry": "n", "ongana": "v", "ony": "n",
-    "orana": "n", "orona": "n", "osa": "adj", "otrika": "n", "paika": "n", "panahy": "n",
-    "petraka": "v", "posy": "n", "raha": "conj", "raharaha": "n", "rahona": "n",
-    "rano": "n", "ravina": "n", "re": "v", "reny": "n", "resaka": "n", "resy": "adj",
-    "rohy": "n", "rova": "n", "sa": "conj", "sady": "conj", "saha": "n", "saka": "n",
-    "sakana": "n", "salama": "adj", "samia": "pron", "samy": "pron", "sary": "n",
-    "sasa": "v", "sazy": "n", "seza": "n", "siramamy": "n", "sisa": "n", "sokajy": "n",
-    "sombina": "n", "sondrona": "n", "songona": "n", "sonia": "n", "soratra": "n",
-    "sosotra": "adj", "tadidy": "n", "tady": "n", "tahotra": "n", "takatra": "n",
-    "tamin": "prep", "tampoka": "adv", "tanana": "n", "tanora": "adj", "tanteraka": "adj",
-    "tao": "v", "taona": "n", "tapaka": "v", "taratasy": "n", "tarih": "n", "tarika": "n",
-    "tatao": "n", "tazana": "v", "teny": "n", "tiana": "v", "toby": "n", "toerana": "n",
-    "toetra": "n", "tokantrano": "n", "toky": "n", "tolo": "n", "tolotra": "n",
-    "tondro": "n", "tonga": "v", "tondra": "v", "tonta": "n", "toro": "n", "tory": "v",
-    "tovo": "n", "trano": "n", "tsara": "adj", "tsena": "n", "tsia": "adv", "tsindry": "v",
+    "laza": "v", "leha": "v", "lehibe": "adj", "loha": "n", "loko": "n", "lositra": "v",
+    "madio": "adj", "mafy": "adj", "mainty": "adj", "maintso": "adj", "maizina": "adj",
+    "malemy": "adj", "mamy": "adj", "manify": "adj", "manitra": "adj", "manta": "adj",
+    "marary": "adj", "marina": "adj", "maro": "adj", "masaka": "adj", "masina": "adj",
+    "maso": "n", "masoandro": "n", "mavo": "adj", "misy": "v", "mora": "adj",
+    "namana": "n", "neny": "n", "nify": "n", "nofo": "n", "ody": "n", "olona": "n",
+    "ome": "v", "ondry": "n", "ongana": "v", "ony": "n", "orana": "n", "orona": "n",
+    "osa": "adj", "otrika": "n", "paika": "n", "panahy": "n", "petraka": "v", "posy": "n",
+    "raha": "conj", "raharaha": "n", "rahona": "n", "rano": "n", "ravina": "n", "re": "v",
+    "reny": "n", "resaka": "n", "resy": "adj", "rohy": "n", "rova": "n", "sa": "conj",
+    "sady": "conj", "saha": "n", "saka": "n", "sakana": "n", "salama": "adj",
+    "samia": "pron", "samy": "pron", "sary": "n", "sasa": "v", "sazy": "n", "seza": "n",
+    "siramamy": "n", "sisa": "n", "sokajy": "n", "sombina": "n", "sondrona": "n",
+    "songona": "n", "sonia": "n", "soratra": "n", "sosotra": "adj", "tadidy": "n",
+    "tady": "n", "tahotra": "n", "takatra": "n", "tamin": "prep", "tampoka": "adv",
+    "tanana": "n", "tanora": "adj", "tanteraka": "adj", "tao": "v", "taona": "n",
+    "tapaka": "v", "taratasy": "n", "tarika": "n", "tatao": "n", "tazana": "v",
+    "teny": "n", "tiana": "v", "toby": "n", "toerana": "n", "toetra": "n",
+    "tokantrano": "n", "toky": "n", "tolo": "n", "tolotra": "n", "tondro": "n",
+    "tonga": "v", "tondra": "v", "tonta": "n", "toro": "n", "tory": "v", "tovo": "n",
+    "trano": "n", "tsara": "adj", "tsena": "n", "tsia": "adv", "tsindry": "v",
     "tsipika": "n", "tsirairay": "adj", "tsiro": "n", "tsoraka": "n", "vahiny": "n",
     "vaky": "v", "vala": "n", "valala": "n", "valy": "v", "vango": "n", "varotra": "n",
     "vary": "n", "vasoka": "adj", "vato": "n", "vava": "n", "vavaka": "n", "vavy": "n",
-    "vazaha": "n", "velona": "adj", "very": "adj", "vidy": "n", "vina": "n", "vintana": "n",
-    "vita": "adj", "vody": "n", "voa": "n", "voahangy": "n", "voanjo": "n", "voary": "n",
-    "vohitra": "n", "vola": "n", "volana": "n", "volo": "n", "voly": "n", "vondrona": "n",
-    "vono": "v", "vory": "v", "votoatiny": "n", "zaha": "v", "zanak": "n", "zanaka": "n",
-    "zara": "n", "zavatra": "n", "zaza": "n", "zoma": "n", "zoro": "n"
+    "vazaha": "n", "velona": "adj", "very": "adj", "vidy": "n", "vina": "n",
+    "vintana": "n", "vita": "adj", "vody": "n", "voa": "n", "voahangy": "n",
+    "voanjo": "n", "voary": "n", "vohitra": "n", "vola": "n", "volana": "n",
+    "volo": "n", "voly": "n", "vondrona": "n", "vono": "v", "vory": "v",
+    "votoatiny": "n", "zaha": "v", "zanaka": "n", "zara": "n", "zavatra": "n",
+    "zaza": "n", "zoma": "n", "zoro": "n", "solosaina": "n",
+    # Emprunts modernes nohagasiana (Politique, Tech, Quotidien, Calendrier, Santé, Transport)
+    "governemanta": "n", "politika": "n", "demokrasia": "n", "repoblika": "n",
+    "prezida": "n", "minisitra": "n", "depiote": "n", "senatera": "n",
+    "kaominina": "n", "distrika": "n", "reziona": "n", "faritany": "n",
+    "tribonaly": "n", "zandarimaria": "n", "polisy": "n", "antoko": "n",
+    "sendika": "n", "ambasady": "n", "konsily": "n", "pasipaoro": "n",
+    "karatra": "n", "karapanondro": "n", "lisitra": "n", "kandida": "n",
+    "ordinatera": "n", "telefaonina": "n", "finday": "n", "aterineto": "n",
+    "internety": "n", "teknolojia": "n", "video": "n", "tranonkala": "n",
+    "pejy": "n", "serasera": "n", "mailaka": "n", "radio": "n",
+    "televiziona": "n", "fahitalavitra": "n", "gazety": "n", "magazina": "n",
+    "artikla": "n", "filma": "n", "sinema": "n", "sekoly": "n",
+    "oniversite": "n", "kolejy": "n", "lisea": "n", "kilasy": "n",
+    "profesora": "n", "direktera": "n", "sekretera": "n", "birao": "n",
+    "kahie": "n", "penina": "n", "penso": "n", "solaitra": "n",
+    "tsaoka": "n", "fizika": "n", "simia": "n", "biolojia": "n",
+    "matematika": "n", "jeografia": "n", "diploma": "n", "banky": "n",
+    "kaonty": "n", "tetibola": "n", "bidezey": "n", "faktiora": "n",
+    "rosia": "n", "karama": "n", "ariary": "n", "iraimbilanja": "n",
+    "euro": "n", "dolara": "n", "sosaiety": "n", "hopitaly": "n",
+    "dispansera": "n", "dokotera": "n", "infirmiera": "n", "vaksiny": "n",
+    "parasetamoly": "n", "vitaminina": "n", "sida": "n", "aotomobila": "n",
+    "kamiao": "n", "bisikileta": "n", "moto": "n", "bajaj": "n",
+    "taksibe": "n", "taksi": "n", "aviona": "n", "sambo": "n",
+    "lamasinina": "n", "gara": "n", "boulva": "n", "alatsinainy": "n",
+    "talata": "n", "alarobia": "n", "alakamisy": "n", "zoma": "n",
+    "sabotsy": "n", "alahady": "n", "janoary": "n", "febroary": "n",
+    "martsa": "n", "aprily": "n", "mey": "n", "jona": "n",
+    "jolay": "n", "aogositra": "n", "septambra": "n", "oktobra": "n",
+    "novambra": "n", "desambra": "n", "kafe": "n", "dite": "n",
+    "dibera": "n", "fromazy": "n", "labiera": "n", "divay": "n",
+    "dipoiro": "n", "lasopy": "n", "salady": "n", "mofomamy": "n",
+    "sokola": "n", "lalimoara": "n", "kidoro": "n", "ondana": "n",
+    "forosety": "n", "lapoaly": "n", "lovia": "n", "vera": "n",
+    "kaopy": "n", "siny": "n", "paompy": "n", "savony": "n",
+    "borosy": "n", "servieta": "n", "valizy": "n", "kitapo": "n",
+    "labozia": "n", "gazy": "n", "lasantsy": "n", "gazoala": "n",
+    "motera": "n", "bateria": "n", "simenitra": "n", "biriky": "n",
+    "fanitso": "n", "visy": "n", "pataloha": "n", "kiraro": "n",
+    "lobaka": "n", "spaoro": "n", "baolina": "n", "baskety": "n",
+    "tenisy": "n", "ekipa": "n", "tompondaka": "n", "medaly": "n",
+    "mozika": "n", "gitara": "n", "piano": "n"
 }
 
-# Formes de surface irrégulières qui ne doivent JAMAIS être dans roots.tsv
+# Formes de surface irrégulières ou fléchies qui ne doivent JAMAIS être dans roots.tsv
 IRREGULAR_SURFACE_FORMS = {
     "ahatongavana", "akany", "akarina", "akaro", "alaina", "alao", "alaona",
     "amidio", "amidy", "ampidinina", "ampidino", "ampidirina", "ampidiro",
@@ -128,7 +175,7 @@ IRREGULAR_SURFACE_FORMS = {
     "petrahana", "renesina", "tazanina", "tenenina", "teneno", "tokisana",
     "toriana", "torio", "valiana", "vidina", "vidio", "lazaina", "lazao",
     "tapahina", "tapaho", "soratana", "soraty", "fambolena", "fahasalamana",
-    "fahendrena"
+    "fahendrena", "babena", "ekena", "ferena", "boina", "daina"
 }
 
 def clean_word(w: str) -> str:
@@ -143,7 +190,8 @@ def is_valid_malagasy_root(w: str) -> bool:
         return False
     if any(c in MALAGASY_INVALID_LETTERS for c in w):
         return False
-    if not re.search(r'([aeioy]|ka|tra|na)$', w):
+    # En malgache, les racines canoniques se terminent par une voyelle ou -tra, -ka, -na, -ra
+    if not re.search(r'([aeioy]|ka|tra|na|ra)$', w):
         return False
     if w in IRREGULAR_SURFACE_FORMS:
         return False
@@ -157,53 +205,43 @@ def is_derived_word(w: str) -> bool:
     if w in IRREGULAR_SURFACE_FORMS:
         return True
     
-    # 0. Réduplications complètes (moramora -> mora, tsaratsara -> tsara, fotsifotsy -> fotsy)
+    # 0. Réduplications complètes (moramora -> mora, tsaratsara -> tsara)
     if len(w) >= 4 and len(w) % 2 == 0:
         half = len(w) // 2
         if w[:half] == w[half:]:
             return True
-    if len(w) >= 6:
-        for i in range(2, len(w) - 2):
-            left = w[:i]
-            right = w[i:]
-            if left == right:
-                return True
-            if left.endswith("i") and right.endswith("y") and left[:-1] == right[:-1]:
-                return True
     
-    # 1. Productive Agent & Circumstantial prefixes (always derived)
+    # 1. Préfixes productifs agents et circonstanciels
     if re.match(r'^(mpan|mpam|mpi|mpang|mpanka|famp|fian|mamp|mian|namp|nian|hamp|hian|maha|naha|haha|faha|fahe|mifank|nifank|hifank|fifank|mifamp|nifamp|hifamp|fifamp|mifan|nifan|hifan|fifan)[a-z]+', w):
         return True
     
-    # 2. Action noun / circumstantial prefixes (fan-, fam-, fang-, fanka-)
+    # 2. Préfixes nominaux d'action / circonstanciels (fan-, fam-, fang-)
     if re.match(r'^(fan|fam|fang|fanka)[a-z]{3,}', w):
         return True
     
-    # 3. Past / future tense verbal prefixes (nan-, nam-, nang-, han-, ham-, hang-)
+    # 3. Préfixes passés / futurs (nan-, nam-, nang-, han-, ham-, hang-)
     if re.match(r'^(nan|nam|nang|nanka|han|ham|hang|hanka)[a-z]{3,}', w):
         return True
     
-    # 4. Past / future simple prefixes (ni-, hi-) on stems > 3 chars
+    # 4. Préfixes simples passés / futurs (ni-, hi-)
     if re.match(r'^(ni|hi)[a-z]{3,}', w):
         return True
     
-    # 5. Verbal prefixes man-, mam-, mang- on words > 4 chars not in legitimate list
+    # 5. Préfixes verbaux actifs man-, mam-, mang- sur mots > 4 lettres non protégés
     if re.match(r'^(man|mam|mang)[a-z]{3,}', w):
         return True
 
-    # 6. Fi- + stem + -ana (circumstantial nouns: fidirana, fidinana, fiasana, fivavahana)
+    # 6. Fi- + stem + -ana
     if re.match(r'^fi[a-z]{2,}(ana|ena|ina)$', w):
         return True
 
-    # 7. Ha- + stem + -ana (abstract quality nouns: hasalamana -> salama, hafaliana -> faly, halavana -> lava)
+    # 7. Ha- + stem + -ana
     if w.startswith("ha") and len(w) >= 7 and re.search(r'(ana|ena|ina)$', w):
         return True
         
-    # 8. Suffixes passifs -ana, -ina, -ena sur mots longs (> 5 lettres)
-    if len(w) >= 6 and re.search(r'(ana|ina|ena)$', w):
-        # Exclure les dérivés passifs comme lazaina, vakina, vonoina, tapahana, soratana
-        if re.search(r'(aina|oina|eina|ahina|ohina|ehina|arana|atana|enana|anana|inana)$', w):
-            return True
+    # 8. Suffixes passifs sur mots longs
+    if len(w) >= 5 and re.search(r'(aina|oina|eina|ahina|ohina|ehina|arana|atana|enana|anana|inana|bena|dena|fena|gena|hena|kena|lena|mena|nena|pena|rena|sena|tena|vena|zena)$', w):
+        return True
         
     return False
 
@@ -240,71 +278,75 @@ def parse_kaikki(path: Path) -> dict:
                     roots[word] = pos
     return roots
 
-def parse_rakibolana(json_dir: Path) -> tuple[dict, list]:
+def parse_rakibolana_db(db_path: Path) -> tuple[dict, list]:
     roots = {}
     pairs = []
-    if not json_dir.exists():
+    if not db_path.exists():
         return roots, pairs
     
-    for fpath in glob.glob(str(json_dir / "*.json")):
-        with open(fpath, "r", encoding="utf-8") as f:
-            try:
-                data = json.load(f)
-            except Exception:
+    conn = sqlite3.connect(db_path)
+    c = conn.cursor()
+    rows = c.execute("SELECT word, definition FROM rakibolana").fetchall()
+    conn.close()
+
+    for raw_w, defn in rows:
+        w = clean_word(raw_w)
+        if defn.strip().lower().startswith("jer.") or defn.strip().lower().startswith("jar."):
+            continue
+        
+        pos = "misc"
+        if any(k in defn for k in ["mt.", "matoanteny"]):
+            pos = "v"
+        elif any(k in defn for k in ["p.t", "p. t", "mpamari", "pi:"]):
+            pos = "adj"
+        elif any(k in defn for k in ["a.", "anarana", "a:"]):
+            pos = "n"
+        elif any(k in defn for k in ["adv.", "adverbe"]):
+            pos = "adv"
+        elif "mp.s" in defn:
+            pos = "pron"
+        elif any(k in defn for k in ["mp.m", "mp.mp"]):
+            pos = "conj"
+        elif "mp.h" in defn:
+            pos = "prep"
+        
+        # 1. Vérifier la racine entre parenthèses : (fototeny)
+        m = re.search(r'^\s*\(([^)]+)\)', defn)
+        if m:
+            inside = clean_word(m.group(1))
+            if inside not in DIALECT_MARKERS and len(inside) >= 2:
+                if is_valid_malagasy_root(inside) and not is_derived_word(inside):
+                    roots[inside] = pos
+                    if is_valid_malagasy_root(w) and w != inside:
+                        pairs.append((w, inside))
+        else:
+            # 2. Entrée simple / racine directe
+            if "mt. ih." in defn or "mt.ih." in defn:
                 continue
-            for entry in data:
-                raw_w = entry.get("word", "")
-                w = clean_word(raw_w)
-                defn = entry.get("definition", "")
+            if is_valid_malagasy_root(w) and not is_derived_word(w):
+                roots[w] = pos
                 
-                # Check for cross-references like "Jer. Forara"
-                if defn.strip().lower().startswith("jer.") or defn.strip().lower().startswith("jar."):
-                    continue
-                
-                pos = "misc"
-                if any(k in defn for k in ["mt.", "matoanteny"]):
-                    pos = "v"
-                elif any(k in defn for k in ["p.t", "p. t", "mpamari", "pi:"]):
-                    pos = "adj"
-                elif any(k in defn for k in ["a.", "anarana", "a:"]):
-                    pos = "n"
-                elif any(k in defn for k in ["adv.", "adverbe"]):
-                    pos = "adv"
-                elif "mp.s" in defn:
-                    pos = "pron"
-                elif any(k in defn for k in ["mp.m", "mp.mp"]):
-                    pos = "conj"
-                elif "mp.h" in defn:
-                    pos = "prep"
-                
-                # Check root in parenthetical syntax: (fototeny)
-                m = re.search(r'^\s*\(([a-zA-Z\-]+)\)', defn)
-                if m:
-                    rw = clean_word(m.group(1))
-                    if is_valid_malagasy_root(rw) and not is_derived_word(rw):
-                        roots[rw] = pos
-                        if is_valid_malagasy_root(w) and w != rw:
-                            pairs.append((w, rw))
-                else:
-                    if "mt. ih." in defn or "mt.ih." in defn:
-                        continue
-                    if is_valid_malagasy_root(w) and not is_derived_word(w):
-                        roots[w] = pos
+        # 3. Vérifier les annotations internes "F.f. : xxx" ou "fototeny : xxx"
+        for m_sub in re.finditer(r'\b(?:fototeny|f\.f|fot|f\.t)\s*[:\-]\s*([a-zA-Z]+)', defn, re.I):
+            rw = clean_word(m_sub.group(1))
+            if is_valid_malagasy_root(rw) and rw not in DIALECT_MARKERS and not is_derived_word(rw):
+                roots[rw] = pos
+
     return roots, pairs
 
 def main():
-    print("=" * 60)
-    print("EXTRACTION ET ENRICHISSEMENT DU LEXIQUE PUR DE RACINES MALGACHES")
-    print("=" * 60)
+    print("=" * 65)
+    print("ENRICHISSEMENT DU LEXIQUE DE RACINES MALGACHES")
+    print("=" * 65)
     
     kaikki = parse_kaikki(KAIKKI_PATH)
     print(f"1. Racines extraites de Kaikki/Wiktionary : {len(kaikki)}")
     
-    rakibolana, pairs = parse_rakibolana(RAKIBOLANA_DIR)
+    rakibolana, pairs = parse_rakibolana_db(RAKIBOLANA_DB_PATH)
     print(f"2. Racines extraites de Rakibolana Malagasy : {len(rakibolana)}")
-    print(f"   Paires morphologiques collectées : {len(pairs)}")
+    print(f"   Paires morphologiques identifiées : {len(pairs)}")
     
-    # Merge
+    # Fusion des sources
     merged = {}
     for k, v in CANONICAL_REQUIRED_ROOTS.items():
         merged[k] = v
@@ -315,21 +357,20 @@ def main():
         if k not in merged or merged[k] == "misc":
             merged[k] = v
             
-    # Final filter: strictly valid roots and not derived
+    # Filtrage final
     final_roots = {}
     for k, v in merged.items():
         if is_valid_malagasy_root(k) and (k in CANONICAL_REQUIRED_ROOTS or not is_derived_word(k)):
             final_roots[k] = v
             
     sorted_roots = sorted(final_roots.items(), key=lambda x: x[0])
-    print(f"\nTotal des racines pures uniques : {len(sorted_roots)}")
+    print(f"\n✅ Total des racines pures uniques validées : {len(sorted_roots)}")
     
-    # Write back to roots.tsv
     header = (
         "# Dictionnaire de racines pures (fototeny) malgaches pour malagasy-stemmer\n"
         "# Format: racine\\tcatégorie (v=verbe, n=nom, adj=adjectif, adv=adverbe, prep=préposition, pron=pronom, conj=conjonction, num=numéral, misc=divers)\n"
         "# Les entrées DOIVENT être triées par ordre alphabétique (requis par fst::MapBuilder).\n"
-        "# Sources: Dictionnaire de référence, Kaikki/Wiktionnaire, Rakibolana Malagasy de l'Académie.\n"
+        "# Sources: Dictionnaire canonique, Kaikki/Wiktionnaire, Rakibolana Malagasy de l'Académie.\n"
     )
     
     with open(ROOTS_TSV_PATH, "w", encoding="utf-8") as f:
@@ -337,8 +378,7 @@ def main():
         for root, cat in sorted_roots:
             f.write(f"{root}\t{cat}\n")
             
-    print(f"Fichier écrit avec succès dans : {ROOTS_TSV_PATH}")
+    print(f"📁 Fichier écrit avec succès : {ROOTS_TSV_PATH}")
 
 if __name__ == "__main__":
     main()
-

@@ -1,14 +1,69 @@
+# Rust build artifacts
 /target
 /Cargo.lock
+crates/**/target
+*.crate
+
+# Compiled binaries and shared libraries
 *.so
 *.dylib
 *.dll
+*.exe
+*.o
+*.a
+
+# Python build artifacts and cache
 __pycache__/
-*.pyc
-.venv/
+*.py[cod]
+*$py.class
 *.egg-info/
-dist/
+.installed.cfg
+*.egg
 build/
+dist/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.manifest
+*.spec
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Testing & Linting cache
 .pytest_cache/
 .mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Documentation build output
 site/
+
+# IDE & Editor artifacts
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+
+# Logs and environment
+*.log
+scratch/
+.env
+.env.*

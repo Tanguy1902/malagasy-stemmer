@@ -90,6 +90,41 @@ for m in matches {
 
 ---
 
+## Intégration Tantivy (`features = ["tantivy"]`)
+
+Activez la feature `tantivy` dans votre `Cargo.toml` :
+
+```toml
+[dependencies]
+tantivy = "0.22"
+malagasy-stemmer = { version = "0.1", features = ["tantivy"] }
+```
+
+```rust
+use malagasy_stemmer::create_malagasy_analyzer;
+use tantivy::Index;
+use tantivy::schema::*;
+
+// 1. Définir le schéma avec l'analyseur 'malagasy'
+let mut schema_builder = Schema::builder();
+let text_options = TextOptions::default()
+    .set_indexing_options(
+        TextFieldIndexing::default()
+            .set_tokenizer("malagasy")
+            .set_index_option(IndexRecordOption::WithFreqsAndPositions)
+    )
+    .set_stored();
+
+let body = schema_builder.add_text_field("body", text_options);
+let schema = schema_builder.build();
+
+// 2. Créer l'index et enregistrer l'analyseur
+let index = Index::create_in_ram(schema);
+index.tokenizers().register("malagasy", create_malagasy_analyzer());
+```
+
+---
+
 ## Benchmarks Criterion
 
 Pour reproduire les benchmarks de performance sur votre machine :

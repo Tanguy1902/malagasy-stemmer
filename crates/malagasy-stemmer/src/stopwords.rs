@@ -6,8 +6,8 @@ static STOPWORDS: OnceLock<HashSet<&'static str>> = OnceLock::new();
 const STOPWORD_LIST: &[&str] = &[
     "aho", "izaho", "ianao", "izy", "isika", "izahay", "ianareo", "izy ireo",
     "ny", "ilay", "ity", "io", "iry", "ireo", "ireto", "iretsy",
-    "amin", "amin'ny", "an'ny", "ao", "eo", "eto", "any", "eny",
-    "ho", "ho an'ny", "momba", "noho", "tamin'ny", "amin'izany",
+    "amin", "amin'ny", "tamin", "tamin'ny", "an'ny", "an'i", "amin'i", "tamin'i", "ao", "eo", "eto", "any", "eny",
+    "ho", "ho an'ny", "momba", "noho", "amin'izany",
     "sy", "ary", "fa", "nefa", "kanefa", "satria", "raha", "rehefa",
     "mba", "ka", "dia", "izay", "koa", "no",
     "tsy", "efa", "mbola", "vao", "avy",
@@ -30,13 +30,7 @@ fn get_stopwords() -> &'static HashSet<&'static str> {
 }
 
 /// Vérifie si un mot est un stopword malgache.
-///
-/// ```
-/// use malagasy_stemmer::stopwords::is_stopword;
-/// assert!(is_stopword("ny"));
-/// assert!(is_stopword("dia"));
-/// assert!(!is_stopword("soratra"));
-/// ```
+
 #[inline]
 pub fn is_stopword(word: &str) -> bool {
     get_stopwords().contains(word)

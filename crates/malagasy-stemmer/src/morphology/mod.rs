@@ -40,14 +40,6 @@ impl MorphologyEngine {
             }];
         }
 
-        if dict.contains(&clean_word) {
-            return vec![RawCandidate {
-                root: clean_word,
-                operation: "exact_root",
-                base_weight: 1.0,
-            }];
-        }
-
         if let Some(compound) = stem_compound(&clean_word, dict) {
             return vec![RawCandidate {
                 root: compound.joined,
@@ -67,6 +59,14 @@ impl MorphologyEngine {
             }
         }
 
+        if dict.contains(&clean_word) {
+            return vec![RawCandidate {
+                root: clean_word,
+                operation: "exact_root",
+                base_weight: 1.0,
+            }];
+        }
+
         let mut candidates = Vec::new();
 
         let infix_cands = strip_infixes(&clean_word, dict);
@@ -80,7 +80,8 @@ impl MorphologyEngine {
 
         let prefix_cands = generate_prefix_candidates(&clean_word, dict);
         for cand in &prefix_cands {
-            let has_sub_suffix = cand.root.ends_with("ana") || cand.root.ends_with("ina") || cand.root.ends_with("ena");
+            let in_dict = dict.contains(&cand.root);
+            let has_sub_suffix = (cand.root.ends_with("ana") || cand.root.ends_with("ina") || cand.root.ends_with("ena")) && !in_dict;
             let weight = if has_sub_suffix { cand.weight * 0.75 } else { cand.weight };
             candidates.push(RawCandidate {
                 root: cand.root.clone(),
@@ -101,7 +102,7 @@ impl MorphologyEngine {
                 candidates.push(RawCandidate {
                     root: restored,
                     operation: "prefix_then_morphophonemic",
-                    base_weight: 0.98,
+                    base_weight: cand.weight * 0.85,
                 });
             }
         }
@@ -119,14 +120,14 @@ impl MorphologyEngine {
                 candidates.push(RawCandidate {
                     root: p_cand.root.clone(),
                     operation: "suffix_then_prefix",
-                    base_weight: p_cand.weight * 1.0,
+                    base_weight: p_cand.weight * cand.weight * 0.95,
                 });
 
                 for restored in restore_morphophonemic_endings(&p_cand.root, dict) {
                     candidates.push(RawCandidate {
                         root: restored,
                         operation: "circumfix_fully_restored",
-                        base_weight: p_cand.weight * 0.95,
+                        base_weight: p_cand.weight * cand.weight * 0.90,
                     });
                 }
             }
@@ -139,14 +140,14 @@ impl MorphologyEngine {
                 candidates.push(RawCandidate {
                     root: cand.root.clone(),
                     operation: "circumfix_combined",
-                    base_weight: cand.weight * 0.92,
+                    base_weight: cand.weight * 0.90,
                 });
 
                 for restored in restore_morphophonemic_endings(&cand.root, dict) {
                     candidates.push(RawCandidate {
                         root: restored,
                         operation: "circumfix_restored_ending",
-                        base_weight: cand.weight * 0.95,
+                        base_weight: cand.weight * 0.85,
                     });
                 }
             }

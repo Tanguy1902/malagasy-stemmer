@@ -77,3 +77,4 @@ nav:
   - API Rust: rust-api.md
   - Intégration RAG & Moteurs: rag-and-search.md
   - Architecture & Performance: architecture.md
+  - Évaluation & Benchmarks: benchmark-results.md

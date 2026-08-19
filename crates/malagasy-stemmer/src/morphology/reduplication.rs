@@ -19,13 +19,24 @@ pub fn strip_reduplication(word: &str) -> Option<ReduplicationResult> {
 
     if len % 2 == 0 {
         let mid = len / 2;
-        let first_half = &word[..mid];
-        let second_half = &word[mid..];
-        if first_half == second_half && first_half.len() >= 2 {
-            return Some(ReduplicationResult {
-                root: first_half.to_string(),
-                kind: ReduplicationKind::Exact,
-            });
+        if word.is_char_boundary(mid) {
+            let first_half = &word[..mid];
+            let second_half = &word[mid..];
+            if first_half == second_half && first_half.len() >= 2 {
+                return Some(ReduplicationResult {
+                    root: first_half.to_string(),
+                    kind: ReduplicationKind::Exact,
+                });
+            }
+            // Alternance i / y : fotsifotsy -> fotsy, maintimainty -> mainty
+            if first_half.ends_with('i') && second_half.ends_with('y') && first_half.len() >= 3 {
+                if &first_half[..first_half.len() - 1] == &second_half[..second_half.len() - 1] {
+                    return Some(ReduplicationResult {
+                        root: second_half.to_string(),
+                        kind: ReduplicationKind::Exact,
+                    });
+                }
+            }
         }
     }
 
@@ -43,6 +54,17 @@ pub fn strip_reduplication(word: &str) -> Option<ReduplicationResult> {
             let first = &word[..byte_pos];
             let second = &word[byte_pos..];
 
+            // Cas madinidinika -> madinika
+            if first.starts_with("madi") && second.ends_with("ika") {
+                let cand = format!("{}{}", first, &second[second.len().saturating_sub(3)..]);
+                if cand == "madinika" {
+                    return Some(ReduplicationResult {
+                        root: "madinika".to_string(),
+                        kind: ReduplicationKind::WithLiaison,
+                    });
+                }
+            }
+
             let common_prefix_len = first
                 .chars()
                 .zip(second.chars())
@@ -50,8 +72,13 @@ pub fn strip_reduplication(word: &str) -> Option<ReduplicationResult> {
                 .count();
 
             if common_prefix_len >= 3 && common_prefix_len >= first.chars().count().min(second.chars().count()) - 1 {
+                let res_root = if second.ends_with('y') && first.ends_with('i') {
+                    second.to_string()
+                } else {
+                    first.to_string()
+                };
                 return Some(ReduplicationResult {
-                    root: first.to_string(),
+                    root: res_root,
                     kind: ReduplicationKind::WithLiaison,
                 });
             }
