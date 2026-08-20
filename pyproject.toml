@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "malagasy-stemmer"
-version = "0.2.0"
+version = "0.3.0"
 description = "High-performance morphological stemmer for the Malagasy language, written in Rust"
 readme = "README.md"
 authors = [{ name = "Fanilo", email = "fanilo@smartrag.dev" }]
