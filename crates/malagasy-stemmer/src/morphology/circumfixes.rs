@@ -42,34 +42,11 @@ pub fn strip_circumfixes(word: &str, dict: &FstDictionary) -> Vec<CircumfixCandi
         return candidates;
     }
 
-    // 0. Direct unstripped remainder match for circumfix words (e.g. fahavariana -> variana, fanadina -> adina)
-    for &prefix in CIRCUMFIX_PREFIXES_SIMPLE {
-        if let Some(after_pfx) = word.strip_prefix(prefix) {
-            if dict.contains(after_pfx) && after_pfx.len() >= 3 {
-                candidates.push(CircumfixCandidate {
-                    root: after_pfx.to_string(),
-                    prefix,
-                    suffix: "unstripped",
-                    weight: 1.03,
-                });
-            }
-        }
-    }
-
     // 1. Circonfixes avec mutations nasales (fam-...-ana, fan-...-ana, fang-...-ana, etc.)
     for nasal_rule in NASAL_MUTATIONS {
         if let Some(after_pfx) = word.strip_prefix(nasal_rule.prefix) {
             if after_pfx.len() < 3 {
                 continue;
-            }
-
-            if dict.contains(after_pfx) {
-                candidates.push(CircumfixCandidate {
-                    root: after_pfx.to_string(),
-                    prefix: nasal_rule.prefix,
-                    suffix: "unstripped",
-                    weight: 1.03,
-                });
             }
 
             for &suffix in CIRCUMFIX_SUFFIXES {

@@ -115,6 +115,20 @@ pub fn strip_suffixes(word: &str, dict: &FstDictionary) -> Vec<SuffixCandidate> 
                 }
             }
 
+            // Roots ending in -y where the -y is absorbed by the suffix
+            // (e.g., fidy + -ina → fidina, so base="fid" → try "fidy")
+            {
+                let cand_y = format!("{}y", base);
+                if dict.contains(&cand_y) && cand_y != word {
+                    candidates.push(SuffixCandidate {
+                        root: cand_y,
+                        suffix: rule.suffix.to_string(),
+                        restoration: "absorbed_y".to_string(),
+                        weight: rule.weight * 0.95,
+                    });
+                }
+            }
+
             if let Some(redup) = crate::morphology::reduplication::strip_reduplication(base) {
                 if dict.contains(&redup.root) {
                     candidates.push(SuffixCandidate {
