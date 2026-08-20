@@ -1,5 +1,4 @@
-//! Orchestrateur du pipeline morphologique pour la langue malgache.
-
+pub mod circumfixes;
 pub mod compounds;
 pub mod infixes;
 pub mod irregular;
@@ -9,12 +8,13 @@ pub mod rules;
 pub mod suffixes;
 
 use crate::dictionary::FstDictionary;
+use circumfixes::strip_circumfixes;
 use compounds::stem_compound;
 use infixes::strip_infixes;
 use irregular::lookup_irregular;
 use prefixes::generate_prefix_candidates;
 use reduplication::strip_reduplication;
-use suffixes::{strip_suffix_only, strip_suffixes};
+use suffixes::strip_suffixes;
 
 #[derive(Debug, Clone)]
 pub struct RawCandidate {
@@ -59,15 +59,15 @@ impl MorphologyEngine {
             }
         }
 
-        if dict.contains(&clean_word) {
-            return vec![RawCandidate {
-                root: clean_word,
-                operation: "exact_root",
-                base_weight: 1.0,
-            }];
-        }
-
         let mut candidates = Vec::new();
+
+        if dict.contains(&clean_word) {
+            candidates.push(RawCandidate {
+                root: clean_word.clone(),
+                operation: "exact_root",
+                base_weight: 0.99,
+            });
+        }
 
         let infix_cands = strip_infixes(&clean_word, dict);
         for cand in infix_cands {
@@ -78,11 +78,27 @@ impl MorphologyEngine {
             });
         }
 
+        // 1. Circonfixes couplés (f-...-ana, faha-...-ana, fam-...-ana, fan-...-ana, etc.)
+        let circum_cands = strip_circumfixes(&clean_word, dict);
+        for cand in circum_cands {
+            candidates.push(RawCandidate {
+                root: cand.root,
+                operation: "circumfix_coupled",
+                base_weight: cand.weight,
+            });
+        }
+
         let prefix_cands = generate_prefix_candidates(&clean_word, dict);
         for cand in &prefix_cands {
             let in_dict = dict.contains(&cand.root);
-            let has_sub_suffix = (cand.root.ends_with("ana") || cand.root.ends_with("ina") || cand.root.ends_with("ena")) && !in_dict;
-            let weight = if has_sub_suffix { cand.weight * 0.75 } else { cand.weight };
+            let weight = if in_dict {
+                cand.weight
+            } else {
+                let word_has_suffix = clean_word.ends_with("ana") || clean_word.ends_with("ina") || clean_word.ends_with("ena");
+                let cand_has_suffix = cand.root.ends_with("ana") || cand.root.ends_with("ina") || cand.root.ends_with("ena");
+                if word_has_suffix && cand_has_suffix { cand.weight * 0.75 } else { cand.weight }
+            };
+
             candidates.push(RawCandidate {
                 root: cand.root.clone(),
                 operation: "prefix_nasal_mutation",
@@ -94,7 +110,7 @@ impl MorphologyEngine {
                 candidates.push(RawCandidate {
                     root: s_cand.root,
                     operation: "prefix_then_suffix",
-                    base_weight: cand.weight * s_cand.weight,
+                    base_weight: cand.weight * s_cand.weight * 0.95,
                 });
             }
 
@@ -128,26 +144,6 @@ impl MorphologyEngine {
                         root: restored,
                         operation: "circumfix_fully_restored",
                         base_weight: p_cand.weight * cand.weight * 0.90,
-                    });
-                }
-            }
-        }
-
-        let (stem_no_suffix, _) = strip_suffix_only(&clean_word);
-        if stem_no_suffix != clean_word && stem_no_suffix.len() >= 3 {
-            let combined_prefix_cands = generate_prefix_candidates(stem_no_suffix, dict);
-            for cand in combined_prefix_cands {
-                candidates.push(RawCandidate {
-                    root: cand.root.clone(),
-                    operation: "circumfix_combined",
-                    base_weight: cand.weight * 0.90,
-                });
-
-                for restored in restore_morphophonemic_endings(&cand.root, dict) {
-                    candidates.push(RawCandidate {
-                        root: restored,
-                        operation: "circumfix_restored_ending",
-                        base_weight: cand.weight * 0.85,
                     });
                 }
             }

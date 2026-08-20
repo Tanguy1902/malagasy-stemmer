@@ -7,8 +7,83 @@ pub struct NasalMutationRule {
 
 pub static NASAL_MUTATIONS: &[NasalMutationRule] = &[
     NasalMutationRule {
+        prefix: "mpampan",
+        vowel_restorations: &["t", "s", "ts", "h", "z"],
+        consonant_mutations: &[("dr", "r"), ("d", "l"), ("d", "t"), ("d", "d"), ("j", "z"), ("j", "j")],
+    },
+    NasalMutationRule {
+        prefix: "fampan",
+        vowel_restorations: &["t", "s", "ts", "h", "z"],
+        consonant_mutations: &[("dr", "r"), ("d", "l"), ("d", "t"), ("d", "d"), ("j", "z"), ("j", "j")],
+    },
+    NasalMutationRule {
+        prefix: "mampan",
+        vowel_restorations: &["t", "s", "ts", "h", "z"],
+        consonant_mutations: &[("dr", "r"), ("d", "l"), ("d", "t"), ("d", "d"), ("j", "z"), ("j", "j")],
+    },
+    NasalMutationRule {
+        prefix: "nampan",
+        vowel_restorations: &["t", "s", "ts", "h", "z"],
+        consonant_mutations: &[("dr", "r"), ("d", "l"), ("d", "t"), ("d", "d"), ("j", "z"), ("j", "j")],
+    },
+    NasalMutationRule {
+        prefix: "hampan",
+        vowel_restorations: &["t", "s", "ts", "h", "z"],
+        consonant_mutations: &[("dr", "r"), ("d", "l"), ("d", "t"), ("d", "d"), ("j", "z"), ("j", "j")],
+    },
+    NasalMutationRule {
+        prefix: "mpampam",
+        vowel_restorations: &["v", "f", "p", "b"],
+        consonant_mutations: &[("b", "v"), ("p", "f")],
+    },
+    NasalMutationRule {
+        prefix: "fampam",
+        vowel_restorations: &["v", "f", "p", "b"],
+        consonant_mutations: &[("b", "v"), ("p", "f")],
+    },
+    NasalMutationRule {
+        prefix: "mampam",
+        vowel_restorations: &["v", "f", "p", "b"],
+        consonant_mutations: &[("b", "v"), ("p", "f")],
+    },
+    NasalMutationRule {
+        prefix: "nampam",
+        vowel_restorations: &["v", "f", "p", "b"],
+        consonant_mutations: &[("b", "v"), ("p", "f")],
+    },
+    NasalMutationRule {
+        prefix: "hampam",
+        vowel_restorations: &["v", "f", "p", "b"],
+        consonant_mutations: &[("b", "v"), ("p", "f")],
+    },
+    NasalMutationRule {
+        prefix: "mpampang",
+        vowel_restorations: &["h", "k", "g", "ng"],
+        consonant_mutations: &[],
+    },
+    NasalMutationRule {
+        prefix: "fampang",
+        vowel_restorations: &["h", "k", "g", "ng"],
+        consonant_mutations: &[],
+    },
+    NasalMutationRule {
+        prefix: "mampang",
+        vowel_restorations: &["h", "k", "g", "ng"],
+        consonant_mutations: &[],
+    },
+    NasalMutationRule {
+        prefix: "nampang",
+        vowel_restorations: &["h", "k", "g", "ng"],
+        consonant_mutations: &[],
+    },
+    NasalMutationRule {
+        prefix: "hampang",
+        vowel_restorations: &["h", "k", "g", "ng"],
+        consonant_mutations: &[],
+    },
+    NasalMutationRule {
         prefix: "man",
-        vowel_restorations: &["s", "t", "ts", "h"],
+        vowel_restorations: &["t", "s", "ts", "h", "z"],
         consonant_mutations: &[
             ("dr", "r"),
             ("d", "l"),
@@ -16,25 +91,25 @@ pub static NASAL_MUTATIONS: &[NasalMutationRule] = &[
             ("d", "d"),
             ("j", "z"),
             ("j", "j"),
+            ("j", "nj"),
         ],
     },
     NasalMutationRule {
         prefix: "mam",
-        vowel_restorations: &["v", "b", "p", "f"],
+        vowel_restorations: &["v", "f", "p", "b"],
         consonant_mutations: &[
             ("b", "v"),
-            ("b", "b"),
             ("p", "f"),
         ],
     },
     NasalMutationRule {
         prefix: "mang",
-        vowel_restorations: &["h", "k", "g"],
+        vowel_restorations: &["h", "k", "g", "ng"],
         consonant_mutations: &[],
     },
     NasalMutationRule {
         prefix: "nan",
-        vowel_restorations: &["s", "t", "ts", "h"],
+        vowel_restorations: &["t", "s", "ts", "h", "z"],
         consonant_mutations: &[
             ("dr", "r"),
             ("d", "l"),
@@ -42,21 +117,22 @@ pub static NASAL_MUTATIONS: &[NasalMutationRule] = &[
             ("d", "d"),
             ("j", "z"),
             ("j", "j"),
+            ("j", "nj"),
         ],
     },
     NasalMutationRule {
         prefix: "nam",
-        vowel_restorations: &["v", "b", "p", "f"],
-        consonant_mutations: &[("b", "v"), ("b", "b"), ("p", "f")],
+        vowel_restorations: &["v", "f", "p", "b"],
+        consonant_mutations: &[("b", "v"), ("p", "f")],
     },
     NasalMutationRule {
         prefix: "nang",
-        vowel_restorations: &["h", "k", "g"],
+        vowel_restorations: &["h", "k", "g", "ng"],
         consonant_mutations: &[],
     },
     NasalMutationRule {
         prefix: "han",
-        vowel_restorations: &["s", "t", "ts", "h"],
+        vowel_restorations: &["t", "s", "ts", "h", "z"],
         consonant_mutations: &[
             ("dr", "r"),
             ("d", "l"),
@@ -64,21 +140,22 @@ pub static NASAL_MUTATIONS: &[NasalMutationRule] = &[
             ("d", "d"),
             ("j", "z"),
             ("j", "j"),
+            ("j", "nj"),
         ],
     },
     NasalMutationRule {
         prefix: "ham",
-        vowel_restorations: &["v", "b", "p", "f"],
-        consonant_mutations: &[("b", "v"), ("b", "b"), ("p", "f")],
+        vowel_restorations: &["v", "f", "p", "b"],
+        consonant_mutations: &[("b", "v"), ("p", "f")],
     },
     NasalMutationRule {
         prefix: "hang",
-        vowel_restorations: &["h", "k", "g"],
+        vowel_restorations: &["h", "k", "g", "ng"],
         consonant_mutations: &[],
     },
     NasalMutationRule {
         prefix: "fan",
-        vowel_restorations: &["s", "t", "ts", "h"],
+        vowel_restorations: &["t", "s", "ts", "h", "z"],
         consonant_mutations: &[
             ("dr", "r"),
             ("d", "l"),
@@ -86,21 +163,22 @@ pub static NASAL_MUTATIONS: &[NasalMutationRule] = &[
             ("d", "d"),
             ("j", "z"),
             ("j", "j"),
+            ("j", "nj"),
         ],
     },
     NasalMutationRule {
         prefix: "fam",
-        vowel_restorations: &["v", "b", "p", "f"],
-        consonant_mutations: &[("b", "v"), ("b", "b"), ("p", "f")],
+        vowel_restorations: &["v", "f", "p", "b"],
+        consonant_mutations: &[("b", "v"), ("p", "f")],
     },
     NasalMutationRule {
         prefix: "fang",
-        vowel_restorations: &["h", "k", "g"],
+        vowel_restorations: &["h", "k", "g", "ng"],
         consonant_mutations: &[],
     },
     NasalMutationRule {
         prefix: "mpan",
-        vowel_restorations: &["s", "t", "ts", "h"],
+        vowel_restorations: &["t", "s", "ts", "h", "z"],
         consonant_mutations: &[
             ("dr", "r"),
             ("d", "l"),
@@ -108,16 +186,17 @@ pub static NASAL_MUTATIONS: &[NasalMutationRule] = &[
             ("d", "d"),
             ("j", "z"),
             ("j", "j"),
+            ("j", "nj"),
         ],
     },
     NasalMutationRule {
         prefix: "mpam",
-        vowel_restorations: &["v", "b", "p", "f"],
-        consonant_mutations: &[("b", "v"), ("b", "b"), ("p", "f")],
+        vowel_restorations: &["v", "f", "p", "b"],
+        consonant_mutations: &[("b", "v"), ("p", "f")],
     },
     NasalMutationRule {
         prefix: "mpang",
-        vowel_restorations: &["h", "k", "g"],
+        vowel_restorations: &["h", "k", "g", "ng"],
         consonant_mutations: &[],
     },
 ];
@@ -191,6 +270,15 @@ pub static SUFFIX_RULES: &[SuffixRule] = &[
     SuffixRule { suffix: "anare", restorations: &["a", "y", "na", "tra", "ka", "ra"], weight: 0.7 },
     SuffixRule { suffix: "tsika", restorations: &["a", "y", "na", "tra"], weight: 0.7 },
     SuffixRule { suffix: "nareo", restorations: &["a", "y", "na", "tra"], weight: 0.7 },
+    SuffixRule { suffix: "ehina", restorations: &["ika", "eka", "ka"], weight: 0.98 },
+    SuffixRule { suffix: "ehena", restorations: &["ika", "eka", "ka"], weight: 0.98 },
+    SuffixRule { suffix: "erina", restorations: &["itra", "etra", "tra"], weight: 0.98 },
+    SuffixRule { suffix: "erana", restorations: &["itra", "etra", "tra"], weight: 0.98 },
+    SuffixRule { suffix: "ohina", restorations: &["oka", "ka"], weight: 0.98 },
+    SuffixRule { suffix: "orina", restorations: &["otra", "tra"], weight: 0.98 },
+    SuffixRule { suffix: "orana", restorations: &["otra", "tra"], weight: 0.98 },
+    SuffixRule { suffix: "ahana", restorations: &["aka", "ka"], weight: 0.98 },
+    SuffixRule { suffix: "ahina", restorations: &["aka", "ka"], weight: 0.98 },
     SuffixRule { suffix: "anay", restorations: &["a", "y", "na", "tra", "ka", "ra"], weight: 0.7 },
     SuffixRule { suffix: "areo", restorations: &["a", "y", "na", "tra"], weight: 0.7 },
     SuffixRule { suffix: "zina", restorations: &["y", "a", "o"], weight: 0.95 },
@@ -199,7 +287,6 @@ pub static SUFFIX_RULES: &[SuffixRule] = &[
     SuffixRule { suffix: "hina", restorations: &["ka", "y", "a"], weight: 0.95 },
     SuffixRule { suffix: "tina", restorations: &["tra", "y", "a"], weight: 0.95 },
     SuffixRule { suffix: "rina", restorations: &["tra", "ra", "y"], weight: 0.95 },
-    SuffixRule { suffix: "nina", restorations: &["na", "y", "a"], weight: 0.95 },
     SuffixRule { suffix: "fina", restorations: &["y", "a"], weight: 0.95 },
     SuffixRule { suffix: "ina", restorations: &["", "y", "a", "na", "tra", "ka", "ra", "e"], weight: 1.0 },
     SuffixRule { suffix: "ana", restorations: &["", "a", "y", "na", "tra", "ka", "ra", "e", "o"], weight: 1.0 },
@@ -244,6 +331,7 @@ pub static SANDHI_MUTATIONS: &[SandhiRule] = &[
     SandhiRule { surface: "d", lexical: "l" },
     SandhiRule { surface: "b", lexical: "v" },
     SandhiRule { surface: "g", lexical: "k" },
+    SandhiRule { surface: "k", lexical: "h" },
     SandhiRule { surface: "j", lexical: "z" },
 ];
 

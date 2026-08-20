@@ -18,23 +18,27 @@ pub fn strip_suffixes(word: &str, dict: &FstDictionary) -> Vec<SuffixCandidate> 
                 continue;
             }
 
+            // Si la base brute après retrait du suffixe est un mot valide du dictionnaire (ex: baikoina -> baiko, lazaina -> laza, dikaina -> dika)
             if dict.contains(base) {
                 candidates.push(SuffixCandidate {
                     root: base.to_string(),
                     suffix: rule.suffix.to_string(),
-                    restoration: String::new(),
-                    weight: rule.weight * 0.70,
+                    restoration: "direct_base".to_string(),
+                    weight: rule.weight * 1.0,
                 });
             }
 
             for &restoration in rule.restorations {
+                if restoration.is_empty() {
+                    continue;
+                }
                 let candidate = format!("{}{}", base, restoration);
                 if candidate != word && dict.contains(&candidate) {
                     candidates.push(SuffixCandidate {
                         root: candidate,
                         suffix: rule.suffix.to_string(),
                         restoration: restoration.to_string(),
-                        weight: rule.weight * 0.98,
+                        weight: rule.weight * 0.92,
                     });
                 }
             }
@@ -111,13 +115,37 @@ pub fn strip_suffixes(word: &str, dict: &FstDictionary) -> Vec<SuffixCandidate> 
                 }
             }
 
-            if dict.contains(base) {
-                candidates.push(SuffixCandidate {
-                    root: base.to_string(),
-                    suffix: rule.suffix.to_string(),
-                    restoration: "direct_base".to_string(),
-                    weight: rule.weight * 0.95,
-                });
+            if let Some(redup) = crate::morphology::reduplication::strip_reduplication(base) {
+                if dict.contains(&redup.root) {
+                    candidates.push(SuffixCandidate {
+                        root: redup.root.clone(),
+                        suffix: format!("{}+redup", rule.suffix),
+                        restoration: "redup".to_string(),
+                        weight: rule.weight * 0.98,
+                    });
+                }
+                if redup.root.ends_with('r') {
+                    let cand_tra = format!("{}tra", &redup.root[..redup.root.len() - 1]);
+                    if dict.contains(&cand_tra) {
+                        candidates.push(SuffixCandidate {
+                            root: cand_tra,
+                            suffix: format!("{}+redup", rule.suffix),
+                            restoration: "redup+r->tra".to_string(),
+                            weight: rule.weight * 0.97,
+                        });
+                    }
+                }
+                if redup.root.ends_with('h') {
+                    let cand_ka = format!("{}ka", &redup.root[..redup.root.len() - 1]);
+                    if dict.contains(&cand_ka) {
+                        candidates.push(SuffixCandidate {
+                            root: cand_ka,
+                            suffix: format!("{}+redup", rule.suffix),
+                            restoration: "redup+h->ka".to_string(),
+                            weight: rule.weight * 0.97,
+                        });
+                    }
+                }
             }
         }
     }

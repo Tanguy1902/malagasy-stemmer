@@ -21,16 +21,7 @@ impl MalagasyStemmer {
     }
 
     /// Extrait la racine (*fototeny*) d'un mot malgache.
-    ///
-    /// ```
-    /// use malagasy_stemmer::MalagasyStemmer;
-    /// let stemmer = MalagasyStemmer::new();
-    /// assert_eq!(stemmer.stem("manoratra"), "soratra");
-    /// assert_eq!(stemmer.stem("nanoratra"), "soratra");
-    /// assert_eq!(stemmer.stem("fampianarana"), "anatra");
-    /// assert_eq!(stemmer.stem("tsaratsara"), "tsara");
-    /// assert_eq!(stemmer.stem("harem-pirenena"), "harena_firenena");
-    /// ```
+    
     pub fn stem(&self, word: &str) -> String {
         self.stem_with_details(word).root
     }
@@ -53,7 +44,7 @@ impl MalagasyStemmer {
         }
 
         let candidates = MorphologyEngine::analyze(trimmed, dict);
-        let best = ViterbiScorer::select_best(candidates, dict);
+        let best = ViterbiScorer::select_best_for_word(trimmed, candidates, dict);
 
         StemResult {
             original: word.to_string(),

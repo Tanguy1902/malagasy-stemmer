@@ -39,7 +39,7 @@ Le malgache possède une morphologie agglutinante particulièrement riche (mutat
   - **Emprunts modernes malgachisés (*Teny nohagasiana*)** : `governemanta`, `politika`, `demokrasia`, `solosaina`, `telefaonina`, `banky`.
 - **Dictionnaire FST ultra-compact** : **9 960+ racines canoniques pures** compilées en un graphe d'états finis (~54 Ko en mémoire, lookup $O(k) < 15$ ns, 0 allocation dynamique).
 - **Intégration Moteur de Recherche (Filtre Tantivy natif)** : `MalagasyStemFilter` et `create_malagasy_analyzer()` intégrés pour Tantivy.
-- **Évaluation formelle standardisée** : **74.91% d'Exact Match** sur 1 387 paires de test de référence (+58% vs baseline naïve).
+- **Évaluation formelle standardisée** : **81.98% d'Exact Match** sur 1 393 paires de test de référence (+64.5% vs baseline naïve).
 - **Vitesse extrême** : **> 1 500 000 mots/seconde** par cœur CPU.
 - **Tolérance aux fautes d'orthographe** : Recherche floue de racines via automates de Levenshtein.
 - **Tokenisation & Stopwords** : Découpage Unicode, gestion des clitiques (`amin'ny`, `an'i`), et filtrage automatique des mots vides malgaches.
@@ -48,19 +48,19 @@ Le malgache possède une morphologie agglutinante particulièrement riche (mutat
 
 ## Résultats des Benchmarks
 
-Évaluation sur **1 387 paires morphologiques étiquetées** issues du *Rakibolana Malagasy* et de règles canoniques :
+Évaluation sur **1 393 paires morphologiques étiquetées** issues du *Rakibolana Malagasy* et de règles canoniques :
 
 | Catégorie Morphologique | Échantillons | `malagasy-stemmer` | Baseline Naïve | Distance Levenshtein Moyenne |
 | :--- | :---: | :---: | :---: | :---: |
 | `irregular_suppletive` | 39 | **100.00%** | 12.82% | 0.00 |
+| `compounds_sandhi` | 17 | **100.00%** | 0.00% | 0.00 |
 | `reduplication` | 21 | **100.00%** | 0.00% | 0.00 |
-| `infix` | 110 | **91.82%** | 0.00% | 0.11 |
-| `simple_prefix` | 300 | **80.33%** | 63.33% | 0.58 |
-| `nasal_active` | 300 | **72.67%** | 10.67% | 0.53 |
-| `passive_suffix` | 300 | **72.33%** | 0.00% | 0.85 |
-| `circumfix` | 300 | **64.67%** | 2.33% | 1.21 |
-| `compounds_sandhi` | 17 | **47.06%** | 0.00% | 1.76 |
-| **SCORE GLOBAL** | **1 387** | **74.91%** | **16.87%** | **0.72** |
+| `infix` | 110 | **97.27%** | 0.91% | 0.03 |
+| `simple_prefix` | 307 | **86.64%** | 63.52% | 0.37 |
+| `passive_suffix` | 299 | **84.62%** | 1.34% | 0.47 |
+| `nasal_active` | 300 | **76.67%** | 10.67% | 0.46 |
+| `circumfix` | 300 | **69.67%** | 2.33% | 0.90 |
+| **SCORE GLOBAL** | **1 393** | **81.98%** | **17.52%** | **0.48** |
 
 ---
 

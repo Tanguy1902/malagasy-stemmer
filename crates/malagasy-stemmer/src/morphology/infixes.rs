@@ -36,6 +36,19 @@ pub fn strip_infixes(word: &str, dict: &FstDictionary) -> Vec<InfixCandidate> {
                         weight: if in_dict { weight } else { weight * 0.4 },
                     });
                 }
+
+                if !rest.starts_with(|c: char| matches!(c, 'a' | 'e' | 'i' | 'o' | 'y')) {
+                    for &v in &["a", "e", "i", "o"] {
+                        let cand_v = format!("{}{}{}", chars[0], v, rest);
+                        if dict.contains(&cand_v) {
+                            candidates.push(InfixCandidate {
+                                root: cand_v,
+                                infix: infix.to_string(),
+                                weight,
+                            });
+                        }
+                    }
+                }
             }
         }
 

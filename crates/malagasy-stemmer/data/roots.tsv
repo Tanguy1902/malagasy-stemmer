@@ -1,25 +1,19 @@
-# Dictionnaire de racines pures (fototeny) malgaches pour malagasy-stemmer
-# Format: racine\tcatégorie (v=verbe, n=nom, adj=adjectif, adv=adverbe, prep=préposition, pron=pronom, conj=conjonction, num=numéral, misc=divers)
-# Les entrées DOIVENT être triées par ordre alphabétique (requis par fst::MapBuilder).
-# Sources: Dictionnaire canonique, Kaikki/Wiktionnaire, Rakibolana Malagasy de l'Académie.
+# dictionnaire de racines pures (fototeny) malgaches pour malagasy-stemmer
+# format: racine\tcatégorie (v=verbe, n=nom, adj=adjectif, adv=adverbe, prep=préposition, pron=pronom, conj=conjonction, num=numéral, misc=divers)
+# les entrées doivent être triées par ordre alphabétique (requis par fst::mapbuilder).
+# sources: dictionnaire canonique, kaikki/wiktionnaire, rakibolana malagasy de l'académie.
 aba	n
 ababe	n
 abado	misc
-abahana	v
-abaribary	v
 abiba	n
 abidy	n
 abilimborona	n
 abily	n
 abo	n
 aboalina	n
-abony	v
-abonynaabosynaambosy	n
-aboretaka	v
 abosy	v
 aby	v
 adabo	misc
-adabobenaadabovavy	misc
 adabolahy	n
 adabovavy	n
 adala	adj
@@ -29,13 +23,10 @@ adaoro	n
 adary	n
 adiady	n
 adibidijady	n
-adidina	adj
-adiditra	v
 adidy	n
 adijady	n
 adikasajy	n
 adiko	n
-adilotra	v
 adimizana	n
 adina	n
 adinandriana	n
@@ -47,7 +38,6 @@ aditsimay	n
 adizaoza	n
 adokadoka	n
 adokdoka	n
-adonadona	n
 adra	n
 adre	n
 adrisa	n
@@ -56,10 +46,6 @@ adyamparimbona	n
 adyantrano	n
 adyantsanga	n
 aera	n
-afafy	v
-afahy	v
-afaingoka	adj
-afaitra	v
 afajaza	adj
 afaka	v
 afakampitso	adv
@@ -67,7 +53,6 @@ afakomaly	adv
 afana	v
 afara	v
 afatobava	adj
-afatotra	v
 afatra	v
 afatrafatra	n
 afatrfatra	n
@@ -103,6 +88,8 @@ afy	n
 agita	v
 agoagaga	n
 agy	n
+aha
+ahana
 ahana	n
 ahanaakanakana	n
 ahanahana	n
@@ -164,6 +151,7 @@ aingitra	n
 aingitraingitra	n
 aiotra	n
 aisy	n
+aitra
 aiva	v
 aivo	misc
 aivoka	adj
@@ -630,6 +618,7 @@ andravana	v
 andray	n
 andre	n
 andrefa	v
+andrefana
 andrefana	n
 andriamanamora	n
 andriamanitra	n
@@ -2041,6 +2030,7 @@ era	v
 erana	n
 erika	n
 erikitra	v
+erina
 erina	misc
 erinerina	n
 eritra	n
@@ -2522,7 +2512,6 @@ foijaza	n
 foitra	n
 foitrabe	n
 foitraivoho	n
-foizina	n
 foka	v
 fokatra	v
 foko	v
@@ -3008,6 +2997,7 @@ hafa	v
 hafaladia	misc
 hafaliandehibe	n
 hafaraka	n
+hafatra
 hafatra	n
 hafeno	n
 hafina	n
@@ -3062,6 +3052,7 @@ halaho	n
 halailay	n
 halaka	n
 halakahalakalaka	n
+halakalaka
 halakalaka	n
 halakamalakalaka	n
 halaky	adj
@@ -3123,6 +3114,7 @@ haraboalavo	n
 haraby	n
 harafa	n
 harafoka	n
+haraka
 haraka	misc
 harakaraka	n
 harambato	n
@@ -3178,6 +3170,7 @@ hatavy	n
 hateza	n
 hatina	n
 hatoka	n
+hatona
 hatona	v
 hatra	v
 hatraboka	n
@@ -4184,6 +4177,7 @@ kiakiaka	n
 kiako	n
 kiaky	n
 kiampongaponga	n
+kiana
 kiana	v
 kianakanaka	n
 kianja	v
@@ -4390,7 +4384,9 @@ kitoatoa	misc
 kitoka	n
 kitokakitokitoka	v
 kitokely	n
+kitokitoka
 kitokitoka	v
+kitokitona
 kitokitona	v
 kitongatonga	v
 kitoto	n
@@ -4606,6 +4602,7 @@ kosoka	v
 kosometa	adj
 kotaba	n
 kotaka	n
+kotana
 kotana	v
 kotika	n
 kotikotika	v
@@ -4619,6 +4616,7 @@ kotopia	n
 kotoratsy	n
 kototany	n
 kotra	n
+kotrakotraka
 kotrakotraka	v
 kotrana	v
 kotranina	n
@@ -4956,6 +4954,7 @@ lihitra	v
 liiotra	v
 lilatra	n
 lilotra	n
+lingilingy
 lingilingy	n
 lingitra	v
 lingy	n
@@ -5042,6 +5041,7 @@ longoa	n
 longoza	n
 longy	n
 lonika	adj
+lonilony
 lonilony	adj
 lonjehitra	v
 lonjika	n
@@ -5609,6 +5609,7 @@ miraefadafy	n
 miraharaha	v
 miramirana	v
 mirana	n
+mirano
 mirano	n
 miraoka	n
 mirazotra	n
@@ -5973,9 +5974,7 @@ olomay	v
 olombaventy	n
 olombelona	n
 olona	n
-olonaandefasanazavatra	n
 olonamay	n
-olonavoahidyantranomaizina	n
 olonay	n
 olonkova	n
 olonolona	n
@@ -6054,6 +6053,7 @@ organa	n
 orika	misc
 orile	n
 orimbato	n
+orina
 orina	n
 orinasa	n
 oritra	n
@@ -6374,6 +6374,7 @@ rahavao	n
 rahavavy	n
 rahefa	n
 rahefaavy	n
+rahona
 rahona	n
 rahoviana	n
 raibe	n
@@ -6385,6 +6386,7 @@ raikely	n
 raiketa	n
 raikidela	v
 raikipohy	n
+raikiraiky
 raikiraiky	n
 raikitelo	n
 raikitra	adj
@@ -6527,6 +6529,7 @@ ranotsilany	n
 ranovelona	n
 ranovoahasina	n
 ranovola	n
+rantiranty
 rantiranty	n
 ranto	n
 rantsambity	n
@@ -6638,6 +6641,7 @@ reninjanaka	n
 reninjaza	n
 reniny	n
 renirano	n
+renireny
 renireny	n
 renisoratra	n
 renivintana	n
@@ -7539,6 +7543,7 @@ somotra	n
 somotraviavy	n
 sompanga	n
 sompatra	adj
+sompirana
 sompirana	v
 sompitra	n
 sonaka	n
@@ -7657,6 +7662,7 @@ tafika	n
 tafiodrivotra	n
 tafioka	n
 tafiotra	n
+tafitafy
 tafitafy	adj
 tafo	n
 tafoaka	n
@@ -8310,13 +8316,13 @@ tomboka	n
 tombokase	n
 tombokavatsa	n
 tombombarotra	n
+tombotomboka
 tombotomboka	n
 tombotsotra	n
 tomefy	adj
 tomika	adj
 tominjaka	adj
 tominjana	n
-tomoetra	v
 tomohoka	adj
 tomombana	adj
 tomotra	n
@@ -9267,6 +9273,7 @@ vampira	n
 vana	adj
 vanaka	n
 vanauana	misc
+vanavana
 vandana	v
 vanditra	n
 vandona	adj
@@ -9482,6 +9489,7 @@ vikauiko	n
 vikina	v
 vikiuiky	adj
 vikiviky	n
+viky
 vilaka	adj
 vilana	adj
 vilany	n
@@ -9546,6 +9554,7 @@ vivitra	n
 vivy	n
 vizana	adj
 vizatra	n
+vizaviza
 vla	v
 vlana	v
 vlona	v
@@ -9662,6 +9671,7 @@ voasarimandina	n
 voasarinikalavola	n
 voasary	n
 voasokera	adj
+voasy
 voatabia	n
 voatabiha	n
 voatango	n

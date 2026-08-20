@@ -39,7 +39,7 @@ Malagasy features a rich, agglutinative morphology with complex nasal mutations,
   - **Modern Malagasy Loanwords (*Teny nohagasiana*)**: `governemanta`, `politika`, `demokrasia`, `solosaina`, `telefaonina`, `banky`.
 - **Ultra-compact FST Dictionary**: **9,960+ pure canonical roots** compiled into a Finite State Transducer graph (~54 KB in memory, $O(k)$ lookup $< 15$ ns, zero dynamic allocations).
 - **Search Engine Ready (Tantivy Native TokenFilter)**: Built-in `MalagasyStemFilter` and `create_malagasy_analyzer()` for the Tantivy search engine.
-- **Formally Evaluated**: **74.91% Exact Match** across 1,387 gold-standard test pairs (+58% absolute gain vs. naive rule-based baselines).
+- **Formally Evaluated**: **81.98% Exact Match** across 1,393 gold-standard test pairs (+64.5% absolute gain vs. naive rule-based baselines).
 - **Extreme Speed**: **> 1,500,000 words/second** per CPU core.
 - **Typo Tolerance**: Fast fuzzy root lookup via Levenshtein automata.
 - **Tokenization & Stopwords**: Smart Unicode punctuation splitter, clitic handling (`amin'ny`, `an'i`), and automatic Malagasy stopword filtering.
@@ -48,19 +48,19 @@ Malagasy features a rich, agglutinative morphology with complex nasal mutations,
 
 ## Benchmark & Accuracy
 
-Evaluated on **1,387 labeled test pairs** spanning 8 morphological dimensions:
+Evaluated on **1,393 labeled test pairs** spanning 8 morphological dimensions:
 
 | Morphological Category | Test Samples | `malagasy-stemmer` | Naive Baseline | Avg Levenshtein Distance |
 | :--- | :---: | :---: | :---: | :---: |
 | `irregular_suppletive` | 39 | **100.00%** | 12.82% | 0.00 |
+| `compounds_sandhi` | 17 | **100.00%** | 0.00% | 0.00 |
 | `reduplication` | 21 | **100.00%** | 0.00% | 0.00 |
-| `infix` | 110 | **91.82%** | 0.00% | 0.11 |
-| `simple_prefix` | 300 | **80.33%** | 63.33% | 0.58 |
-| `nasal_active` | 300 | **72.67%** | 10.67% | 0.53 |
-| `passive_suffix` | 300 | **72.33%** | 0.00% | 0.85 |
-| `circumfix` | 300 | **64.67%** | 2.33% | 1.21 |
-| `compounds_sandhi` | 17 | **47.06%** | 0.00% | 1.76 |
-| **GLOBAL SCORE** | **1,387** | **74.91%** | **16.87%** | **0.72** |
+| `infix` | 110 | **97.27%** | 0.91% | 0.03 |
+| `simple_prefix` | 307 | **86.64%** | 63.52% | 0.37 |
+| `passive_suffix` | 299 | **84.62%** | 1.34% | 0.47 |
+| `nasal_active` | 300 | **76.67%** | 10.67% | 0.46 |
+| `circumfix` | 300 | **69.67%** | 2.33% | 0.90 |
+| **GLOBAL SCORE** | **1,393** | **81.98%** | **17.52%** | **0.48** |
 
 ---
 
