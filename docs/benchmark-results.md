@@ -4,7 +4,7 @@ Ce document présente l'évaluation quantitative formelle de la bibliothèque `m
 
 ---
 
-## 📊 1. Tableau Récapitulatif des Métriques
+## :fontawesome-solid-chart-simple: 1. Tableau Récapitulatif des Métriques
 
 | Métrique | `malagasy-stemmer` (FST + Scorer) | Baseline Naïve (Rule Strip) | Baseline Identité (Sans stemming) |
 | :--- | :---: | :---: | :---: |
@@ -14,7 +14,7 @@ Ce document présente l'évaluation quantitative formelle de la bibliothèque `m
 
 ---
 
-## 🎯 2. Détail par Catégorie Morphologique
+## :fontawesome-solid-bullseye: 2. Détail par Catégorie Morphologique
 
 | Catégorie Morphologique | Échantillons | Précision `malagasy-stemmer` | Précision Baseline Naïve | Distance Levenshtein Moyenne |
 | :--- | :---: | :---: | :---: | :---: |
@@ -29,7 +29,7 @@ Ce document présente l'évaluation quantitative formelle de la bibliothèque `m
 
 ---
 
-## 🔍 3. Analyse & Méthodologie
+## :fontawesome-solid-magnifying-glass: 3. Analyse & Méthodologie
 
 - **Testbed de Référence** : 1387 cas couvrant les 8 dimensions morphologiques de la langue malgache (mutations nasales, préfixes simples, suffixes passifs/impératifs, circonfixes nominaux, infixes aspectuels, réduplications, sandhi et verbes supplétifs irréguliers).
 - **Gain de Précision** : Le moteur guidé par transducteur à états finis (**FST**) surpasse la baseline naïve de **+58.04%** de précision grâce à la désambiguïsation morphologique et à l'ancrage lexical.

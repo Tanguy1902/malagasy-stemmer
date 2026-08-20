@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <a href="README.md">🇬🇧 <strong>Read this documentation in English</strong></a>
+  <a href="README.md"><strong>[ English Documentation ]</strong></a>
 </p>
 
 ---

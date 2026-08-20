@@ -22,7 +22,7 @@ La langue malgache (_Teny Malagasy_, langue austronésienne) possède une morpho
 
 `malagasy-stemmer` résout ces défis en combinant :
 
-- ⚡ **Transducteurs à États Finis (FST)** : Un dictionnaire compact de **plus de 10 000 racines** compilé en graphe d'états finis (< 54 Ko en mémoire, lookup en $O(k)$ < 15 ns).
+- :fontawesome-solid-bolt: **Transducteurs à États Finis (FST)** : Un dictionnaire compact de **plus de 10 000 racines** compilé en graphe d'états finis (< 54 Ko en mémoire, lookup en $O(k)$ < 15 ns).
 - **Morphologie formelle à deux niveaux** : Détection et désaffixation récursive des préfixes, suffixes, infixes, réduplications et sandhi.
 - **Désambiguïsation probabiliste (Viterbi)** : Sélection du meilleur candidat basée sur la phonotaxie malgache, les priors lexicaux et les pénalités d'affixation.
 - **Tolérance aux fautes d'orthographe (Levenshtein)** : Recherche floue de racines ultra-rapide par intersection d'automates.

@@ -364,21 +364,20 @@ def main():
             final_roots[k] = v
             
     sorted_roots = sorted(final_roots.items(), key=lambda x: x[0])
-    print(f"\n✅ Total des racines pures uniques validées : {len(sorted_roots)}")
-    
+    print(f"\n[OK] Total des racines pures uniques validées : {len(sorted_roots)}")
+
     header = (
         "# Dictionnaire de racines pures (fototeny) malgaches pour malagasy-stemmer\n"
-        "# Format: racine\\tcatégorie (v=verbe, n=nom, adj=adjectif, adv=adverbe, prep=préposition, pron=pronom, conj=conjonction, num=numéral, misc=divers)\n"
-        "# Les entrées DOIVENT être triées par ordre alphabétique (requis par fst::MapBuilder).\n"
-        "# Sources: Dictionnaire canonique, Kaikki/Wiktionnaire, Rakibolana Malagasy de l'Académie.\n"
+        "# Format: racine\tcatégorie\n"
+        "# Les entrées DOIVENT être triées par ordre alphabétique (requis par fst::SetBuilder).\n"
     )
-    
+
     with open(ROOTS_TSV_PATH, "w", encoding="utf-8") as f:
         f.write(header)
         for root, cat in sorted_roots:
             f.write(f"{root}\t{cat}\n")
-            
-    print(f"📁 Fichier écrit avec succès : {ROOTS_TSV_PATH}")
+
+    print(f"[OK] Fichier écrit avec succès : {ROOTS_TSV_PATH}")
 
 if __name__ == "__main__":
     main()

@@ -145,18 +145,18 @@ class SimpleMalagasyRAG:
 
     def answer_question(self, query: str) -> str:
         """Pipeline RAG complet : Récupération de contexte + Génération."""
-        print(f"\n❓ FANONTANIANA (Question) : « {query} »")
+        print(f"\nFANONTANIANA (Question) : « {query} »")
         
         # Décomposition morphologique de la requête
         query_roots = mg.tokenize_and_stem(query, remove_stopwords=True)
-        print(f"🔍 Racines extraites de la requête : {query_roots}")
+        print(f"Racines extraites de la requête : {query_roots}")
 
         results = self.search(query, top_k=2)
 
         if not results:
             return "Tsy nahitana valiny mifanaraka amin'ny fanontaniana."
 
-        print("\n📄 TAHIRIN-KEVITRA HITA (Documents Récupérés) :")
+        print("\nTAHIRIN-KEVITRA HITA (Documents Récupérés) :")
         for i, res in enumerate(results, 1):
             print(f"  [{i}] {res.title} (Score BM25: {res.score})")
             print(f"      Racines correspondantes : {res.matched_roots}")
@@ -166,7 +166,7 @@ class SimpleMalagasyRAG:
         context = "\n".join([f"- {r.content}" for r in results])
         
         return (
-            f"\n💡 VALINTENY SY FAMINTINANA (Réponse RAG) :\n"
+            f"\nVALINTENY SY FAMINTINANA (Réponse RAG) :\n"
             f"Araka ny tahirin-kevitra, mifototra amin'ireto fampahalalana ireto ny valiny :\n"
             f"{context}"
         )
@@ -174,9 +174,9 @@ class SimpleMalagasyRAG:
 
 def main():
     rag = SimpleMalagasyRAG()
-    print("🚀 Fampidirana ireo tahirin-kevitra (Indexation en cours)...")
+    print("Fampidirana ireo tahirin-kevitra (Indexation en cours)...")
     rag.index_documents(KNOWLEDGE_BASE)
-    print(f"✅ Documents indexés avec succès : {len(KNOWLEDGE_BASE)} documents.\n")
+    print(f"Documents indexés avec succès : {len(KNOWLEDGE_BASE)} documents.\n")
 
     # Tests de requêtes avec des flexions verbales très différentes du document source
     queries = [

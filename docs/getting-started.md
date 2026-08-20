@@ -4,7 +4,7 @@ Ce guide vous accompagne pas à pas pour installer et utiliser **`malagasy-stemm
 
 ---
 
-## 🐍 Installation en Python
+## :fontawesome-brands-python: Installation en Python
 
 `malagasy-stemmer` est distribué sous forme de *wheels* binaires précompilées sur **PyPI** pour Linux (x86_64, aarch64), macOS (Intel, Apple Silicon) et Windows. Aucun compilateur C/Rust n'est requis sur la machine cible.
 
@@ -27,14 +27,14 @@ Version OK, test: soratra
 
 ---
 
-## 🦀 Installation en Rust
+## :fontawesome-brands-rust: Installation en Rust
 
 Pour intégrer le moteur natif dans un projet Rust :
 
 ### `Cargo.toml`
 ```toml
 [dependencies]
-malagasy-stemmer = "0.1"
+malagasy-stemmer = "0.2"
 ```
 
 ### Exemple minimal (`main.rs`)
@@ -52,7 +52,7 @@ fn main() {
 
 ---
 
-## 🚀 Premiers cas d'usage
+## :fontawesome-solid-rocket: Premiers cas d'usage
 
 ### 1. Normaliser des mots isolés
 ```python

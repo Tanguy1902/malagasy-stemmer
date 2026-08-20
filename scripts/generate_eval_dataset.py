@@ -264,7 +264,8 @@ def build_evaluation_dataset(target_size_per_cat=300):
         for s, r, cat in all_eval_entries:
             f.write(f"{s}\t{r}\t{cat}\n")
 
-    print(f"📁 Fichier d'évaluation généré : {EVAL_DATASET_PATH}")
+    print(f"[OK] Fichier d'évaluation généré : {EVAL_DATASET_PATH}")
+    print(f"Total des paires morphologiques : {len(all_eval_entries)}")
 
 if __name__ == "__main__":
     build_evaluation_dataset()

@@ -88,21 +88,22 @@ fn main() -> tantivy::Result<()> {
 
     for (query_str, description) in test_queries {
         println!("--------------------------------------------------");
-        println!("🔍 Requête : \"{}\" ({})", query_str, description);
+        println!("--- Requête : \"{}\" ({})", query_str, description);
 
         let query = query_parser.parse_query(query_str)?;
-        let top_docs = searcher.search(&query, &TopDocs::with_limit(5))?;
+        let top_docs = searcher.search(&query, &TopDocs::with_limit(3))?;
 
         if top_docs.is_empty() {
-            println!("   (Aucun résultat trouvé)");
+            println!("   [x] Aucun document trouvé.");
         } else {
             for (score, doc_address) in top_docs {
                 let retrieved: TantivyDocument = searcher.doc(doc_address)?;
                 let title = retrieved.get_first(title_field).unwrap().as_str().unwrap();
                 let id = retrieved.get_first(id_field).unwrap().as_u64().unwrap();
-                println!("   ✓ [Score: {:.4}] Doc #{} : \"{}\"", score, id, title);
+                println!("   [Score: {:.4}] Doc #{} : \"{}\"", score, id, title);
             }
         }
+        println!();
     }
 
     println!("\n=== Fin de la démonstration ===");
