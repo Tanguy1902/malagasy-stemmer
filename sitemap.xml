@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://tanguy1902.github.io/malagasy-stemmer/</loc>
+         <lastmod>2026-08-20</lastmod>
+    </url>
+    <url>
+         <loc>https://tanguy1902.github.io/malagasy-stemmer/architecture/</loc>
+         <lastmod>2026-08-20</lastmod>
+    </url>
+    <url>
+         <loc>https://tanguy1902.github.io/malagasy-stemmer/benchmark-results/</loc>
+         <lastmod>2026-08-20</lastmod>
+    </url>
+    <url>
+         <loc>https://tanguy1902.github.io/malagasy-stemmer/getting-started/</loc>
+         <lastmod>2026-08-20</lastmod>
+    </url>
+    <url>
+         <loc>https://tanguy1902.github.io/malagasy-stemmer/linguistics/</loc>
+         <lastmod>2026-08-20</lastmod>
+    </url>
+    <url>
+         <loc>https://tanguy1902.github.io/malagasy-stemmer/python-api/</loc>
+         <lastmod>2026-08-20</lastmod>
+    </url>
+    <url>
+         <loc>https://tanguy1902.github.io/malagasy-stemmer/rag-and-search/</loc>
+         <lastmod>2026-08-20</lastmod>
+    </url>
+    <url>
+         <loc>https://tanguy1902.github.io/malagasy-stemmer/rust-api/</loc>
+         <lastmod>2026-08-20</lastmod>
+    </url>
+</urlset>
